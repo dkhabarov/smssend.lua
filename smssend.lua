@@ -80,6 +80,9 @@ function cliarg_parser()
 		end
 		if tArgs.version then
 			print(('smssend.lua version: %s'):format(_MYVERSION))
+			if smsrulib._VERSION then
+				print(('smsrulib version: %s'):format(smsrulib._VERSION))
+			end
 			os.exit(_EXIT_SUCCESS)
 		end
 	end
