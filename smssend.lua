@@ -436,5 +436,6 @@ if arg and type(arg) == 'table' then
 		main()
 	else 
 		print('Supports only *nix OS.')
+		os.exit(_EXIT_ERRUSE)
 	end
 end
