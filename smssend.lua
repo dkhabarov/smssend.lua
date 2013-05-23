@@ -432,5 +432,9 @@ function stoplist_del()
 end
 
 if arg and type(arg) == 'table' then
-	main()
+	if get_os() ~= 2 then
+		main()
+	else 
+		print('Supports only *nix OS.')
+	end
 end
