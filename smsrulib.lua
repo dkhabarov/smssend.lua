@@ -43,7 +43,7 @@ local function isset(d)
 	end
 end
 
-local function ltable2http_arg(t)
+local function build_http_query(t)
 	local s,c = '',0
 	for i,v in base.pairs(t) do
 		if isset(v) then
@@ -70,7 +70,7 @@ function service_call(method, args)
 	end
 	local url=''
 	if base.type(args) == 'table' then
-		url = (('http://sms.ru/%s?%s'):format(method, ltable2http_arg(args)))
+		url = (('http://sms.ru/%s?%s'):format(method, build_http_query(args)))
 	else
 		url = (('http://sms.ru/%s'):format(method))
 	end
