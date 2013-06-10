@@ -228,11 +228,25 @@ function get_msg()
 	end
 end
 
+function check_rc_access()
+	if get_os() == 1 then
+		local posix = require'posix'
+		local home = get_home_path()
+		for index,value in pairs(posix.stat(home..'/.smssendrc')) do
+			if index == 'mode' and value ~= 'rw-------' then
+				print('\''..home..'/.smssendrc\' must not be accessible by others (Use: \'chmod 600 '..home..'/.smssendrc\')')
+				os.exit(_EXIT_ERRUSE)
+			end
+		end
+	end
+end
+
 function main()
 	cliarg_parser()
 	if not tArgs.login or not tArgs.password then
 		login, password = read_smssendrc()
 		if login and password then
+			check_rc_access()
 			tArgs.login = login
 			tArgs.password = password
 		else 
