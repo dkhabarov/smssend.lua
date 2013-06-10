@@ -27,18 +27,30 @@ local _MYVERSION = '0.2-beta'
 function show_help()
 	print('\n\tsmssend is a program to send SMS messages from the commandline.\n\tUsing API service http://sms.ru\
 \tCopyright © 2009-2012 by Denis Khabarov aka \'Saymon21\'\n\tE-Mail: saymon at hub21 dot ru (saymon@hub21.ru)\
-\tHomepage: http://opensource.hub21.ru/smssend.lua\n\n\tOptions:')
-	print('\t--help', '- show this help')
-	print('\t--version', '- show version')
-	print('\t--login', '- login at service sms.ru')
-	print('\t--password', '- password at service sms.ru')
-	print('\t--action', '- run action (available actions: send, status, cost, balance, limit, stoplistadd, stoplistdel)')
-	print('\t--to', '- send message to this phone number')
-	print('\t--message', '- don\'t read stdin. Send text from this argument')
-	print('\t--from', '- sender name')
-	print('\t--time', '- set send time (in unixtime format)')
-	print('\t--translit', '- convert message to translit')
+\tHomepage: http://opensource.hub21.ru/smssend.lua\n\tLicence: GNU General Public License version 3\n\tYou can download full text of the license on http://www.gnu.org/licenses/gpl-3.0.txt\n')
+	show_usage()
+	print('\n\tOptions:')
+	print('\t--help', ': show this help')
+	print('\t--version', ': show version')
+	print('\t--login', 'VALUE', ': login at service sms.ru')
+	print('\t--password', 'VALUE', ': password at service sms.ru')
+	print('\t--action', 'VALUE', ': run action (available actions: send, status, cost, balance, limit, stoplistadd, stoplistdel) (default: send)')
+	print('\t--to', 'VALUE', ': send message to this phone number')
+	print('\t--message', 'VALUE', ': don\'t read stdin. Send text from this argument')
+	print('\t--from', 'VALUE', ': sender name')
+	print('\t--time', 'VALUE', ': set send time (in unixtime format)')
+	print('\t--translit', ': convert message to translit')
+	print('\n')
 	os.exit(_EXIT_SUCCESS)
+end
+
+function show_usage()
+	local usage=[[usage: %s [ --login=VALUE] [ --password='VALUE' ] [ --action=send|status|cost|balance|limit|stoplistadd|stoplistdel ] --to=VALUE [ --message='VALUE' ] [ --from=NAME ] [ --time=VALUE ] [ --translit ] [ --help ] [ --version ] ]]
+	print(usage:format(getname()))
+end
+
+function getname()
+	return arg[0]:gsub('./','')
 end
 
 function cliarg_parser()
@@ -57,7 +69,8 @@ function cliarg_parser()
 				if name and value and available_args[name:lower()] then
 					tArgs[name:lower()] = value
 				else
-					print(('Unknown commandline argument used: %s\nusage: %s --help'):format(val,arg[0]))
+					print(('Unknown commandline argument used: %s'):format(val))
+					show_usage()
 					os.exit(_EXIT_ERRUSE)
 				end
 			else
@@ -65,7 +78,8 @@ function cliarg_parser()
 				if name and  available_args[name:lower()] then
 					tArgs[name:lower()] = true
 				else
-					print(('Unknown commandline argument used: %s\nusage: %s --help'):format(val,arg[0]))
+					print(('Unknown commandline argument used: %s'):format(val))
+					show_usage()
 					os.exit(_EXIT_ERRUSE)
 				end
 			end
@@ -83,6 +97,7 @@ function cliarg_parser()
 			if smsrulib._VERSION then
 				print(('smsrulib version: %s'):format(smsrulib._VERSION))
 			end
+			print(('Lang version: %s'):format(_VERSION))
 			os.exit(_EXIT_SUCCESS)
 		end
 	end
@@ -176,7 +191,7 @@ function read_password()
     local password
     while true do
         io.write("Enter password: ")
-        password = getpass();
+        password = getpass()
         if not password then
             print("No password - cancelled")
             return
@@ -223,6 +238,7 @@ function main()
 		else 
 			login = term_get_login()
 			if not login then
+				print('No login - cancelled')
 				os.exit(_EXIT_ERRUSE)
 			else 
 				tArgs.login = login
@@ -431,11 +447,13 @@ function stoplist_del()
 	end
 end
 
-if arg and type(arg) == 'table' then
-	if get_os() ~= 2 then
+if arg and type(arg) == 'table' then -- Python-style: if __name__ == "__main__" # ^_^
+	if get_os() ~= 2 then -- check os
 		main()
 	else 
 		print('Supports only *nix OS.')
 		os.exit(_EXIT_ERRUSE)
 	end
+else 
+	error('Calling the this script as a module for the programming language, it\'s not a good idea.')
 end
